@@ -5,55 +5,55 @@ type Trim<S> = LTrim<RTrim<S>>;
 type TrimBrackets<S> = S extends `(${infer I})` ? I : S;
 
 type Plus1<T extends unknown[]> = [unknown, ...T];
-type Minus1<T extends unknown[]> = T extends [unknown, ...infer R] ? R : []; 
+type Minus1<T extends unknown[]> = T extends [unknown, ...infer R] ? R : [];
 type Split<S, Delimiter, Acc extends string = '', Count extends [unknown[], unknown[]] = [[], []]> = S extends `${infer F}${infer R}`
   ? F extends Delimiter
-    ? [Count[0]['length'], Count[1]['length']] extends [0, 0]
-      ? [Acc, ...Split<R, Delimiter>]
-      : Split<R, Delimiter, `${Acc}${F}`, Count>
-    : F extends '<' | '>' | '(' | ')'
-      ? {
-          '<': Split<R, Delimiter, `${Acc}${F}`, [Plus1<Count[0]>, Count[1]]>,
-          '>': Split<R, Delimiter, `${Acc}${F}`, [Minus1<Count[0]>, Count[1]]>,
-          '(': Split<R, Delimiter, `${Acc}${F}`, [Count[0], Plus1<Count[1]>]>,
-          ')': Split<R, Delimiter, `${Acc}${F}`, [Count[0], Minus1<Count[1]>]>,
-        }[F]
-      : Split<R, Delimiter, `${Acc}${F}`, Count>
+  ? [Count[0]['length'], Count[1]['length']] extends [0, 0]
+  ? [Acc, ...Split<R, Delimiter>]
+  : Split<R, Delimiter, `${Acc}${F}`, Count>
+  : F extends '<' | '>' | '(' | ')'
+  ? {
+    '<': Split<R, Delimiter, `${Acc}${F}`, [Plus1<Count[0]>, Count[1]]>,
+    '>': Split<R, Delimiter, `${Acc}${F}`, [Minus1<Count[0]>, Count[1]]>,
+    '(': Split<R, Delimiter, `${Acc}${F}`, [Count[0], Plus1<Count[1]>]>,
+    ')': Split<R, Delimiter, `${Acc}${F}`, [Count[0], Minus1<Count[1]>]>,
+  }[F]
+  : Split<R, Delimiter, `${Acc}${F}`, Count>
   : [Acc];
 
 // primitive type list
 type PrimitiveMap = {
-  'number': number,
-  'string': string,
-  'boolean': boolean,
-  'date': Date,
-  'undefined': undefined,
-  'null': null,
-  'unknown': unknown,
-  'never': never,
-  'void': void,
+  number: number,
+  string: string,
+  boolean: boolean,
+  Date: Date,
+  undefined: undefined,
+  null: null,
+  unknown: unknown,
+  never: never,
+  void: void,
 };
 
 // string -> define object
 type ParseDefine<D, S = Trim<D>> = Split<S, '|'> extends infer U extends unknown[]
   ? U['length'] extends 1
-    ? S extends `${infer A}[]`
-      ? DArray<TrimBrackets<A>>
-      : S extends keyof PrimitiveMap
-        ? PrimitiveMap[S]
-        : S extends `${infer T}<${infer V}>`
-          ? {
-              Literal: DLiteral<V>,
-              Map: DMap<V>,
-              Set: DSet<V>,
-              Promise: DPromise<V>,
-              Function: DFunction<V>,
-              Array: DArray<V>,
-              Tuple: DTuple<V>,
-              [x: string]: unknown,
-            }[T]
-          : unknown
-    : DUnion<U>
+  ? S extends `${infer A}[]`
+  ? DArray<TrimBrackets<A>>
+  : S extends keyof PrimitiveMap
+  ? PrimitiveMap[S]
+  : S extends `${infer T}<${infer V}>`
+  ? {
+    Literal: DLiteral<V>,
+    Map: DMap<V>,
+    Set: DSet<V>,
+    Promise: DPromise<V>,
+    Function: DFunction<V>,
+    Array: DArray<V>,
+    Tuple: DTuple<V>,
+    [x: string]: unknown,
+  }[T]
+  : unknown
+  : DUnion<U>
   : unknown;
 // map(v => ParseDefine(v))
 type MapParse<T> = T extends [infer F, ...infer R]
@@ -95,10 +95,10 @@ type CLiteral<T> = T extends {
 // string: Map<string, boolean>
 type DMap<T> = Split<T, ','> extends [infer K, infer V]
   ? {
-      type: 'map',
-      key: ParseDefine<K>,
-      value: ParseDefine<V>,
-    }
+    type: 'map',
+    key: ParseDefine<K>,
+    value: ParseDefine<V>,
+  }
   : unknown;
 // define -> type
 type CMap<T> = T extends {
@@ -146,11 +146,11 @@ type CFunction<T> = T extends {
   args: infer A,
   return: infer R,
 } ? FromDefine<A> extends infer CA
-    // possibly 'never'
-    ? [CA] extends [unknown[]]
-      ? (...args: CA) => FromDefine<R>
-      : (arg: CA) => FromDefine<R>
-    : unknown
+  // possibly 'never'
+  ? [CA] extends [unknown[]]
+  ? (...args: CA) => FromDefine<R>
+  : (arg: CA) => FromDefine<R>
+  : unknown
   : unknown;
 
 // define union object
@@ -189,51 +189,26 @@ type CTuple<T> = T extends {
   value: infer V
 } ? MapFrom<V> : unknown;
 
-type SchemaValue = `@${string}` | Schema | [Schema];
-type SchemaUnionValue = {
-  type: 'union',
-  value: SchemaValue[],
-};
-type Schema = {
-  [key: string]: SchemaValue | SchemaUnionValue;
-};
-
 type FromSchemaUnionValue<T> = T extends [infer F, ...infer R]
   ? [FromSchemaValue<F>, ...FromSchemaUnionValue<R>]
   : [];
 type FromSchemaValue<T> = T extends { type: 'union', value: infer V }
   ? FromSchemaUnionValue<V>[number]
   : T extends `@${infer S}`
-    ? FromDefine<ParseDefine<S>>
-    : FromSchema<T>;
-type FromSchema<T> = T extends [Schema]
+  ? FromDefine<ParseDefine<S>>
+  : FromSchema<T>;
+export type FromSchema<T> = T extends [unknown]
   ? FromSchema<T[0]>[]
   : {
-      [K in keyof T]: FromSchemaValue<T[K]>;
-    };
+    [K in keyof T]: FromSchemaValue<T[K]>;
+  };
 
-declare function fromSchema<T extends Schema | [Schema]>(schema: T): FromSchema<T>;
-const schema = {
-  id: '@number',
-  name: '@(string | undefined)[]',
-  address: '@Array<string | undefined>',
-  detail: {
-    type: 'union',
-    value: [
-      {
-        id: '@number',
-        memo: '@string | undefined',
-      },
-      '@undefined',
-    ]
-  }
-} satisfies Schema;
-const check = fromSchema(schema);
-// const schemaChecker = <T extends Schema>(schema: T) => (arg: unknown): arg is FromSchema<T> => {
-//   if (typeof arg !== 'object' || arg === null) return false;
-//   return Object.entries(schema).every(([key, value]) => {
-//     if (!(key in arg)) return false;
-//     const valueType = value.slice(1);
-
-//   });
-// };
+type SchemaValue = `@${string}` | Schema | [Schema];
+type SchemaUnionValue = {
+  type: 'union',
+  value: SchemaValue[],
+};
+export type Schema = {
+  [key: string]: SchemaValue | SchemaUnionValue;
+};
+export const isSchemaUnionValue = (arg: SchemaValue | SchemaUnionValue): arg is SchemaUnionValue => typeof arg === 'object' && 'type' in arg && arg.type === 'union';
