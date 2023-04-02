@@ -55,7 +55,9 @@ const primitiveChecker: Record<string, (arg: unknown) => boolean> = {
 const parse2checker = (str: string) => {
   const s = str.trim();
   const unionTuple = split(s, '|');
-
+  if (unionTuple.length === 1) {
+    
+  }
 };
 
 export const schemaChecker = <T extends Schema | [Schema]>(schema: T) => (arg: unknown): arg is FromSchema<T> => {
