@@ -35,7 +35,7 @@ type PrimitiveMap = {
 };
 
 // string -> define object
-type ParseDefine<D, S = Trim<D>> = Split<S, '|'> extends infer U extends unknown[]
+type Parse2Define<D, S = Trim<D>> = Split<S, '|'> extends infer U extends unknown[]
   ? U['length'] extends 1
   ? S extends `${infer A}[]`
   ? DArray<TrimBrackets<A>>
@@ -57,7 +57,7 @@ type ParseDefine<D, S = Trim<D>> = Split<S, '|'> extends infer U extends unknown
   : unknown;
 // map(v => ParseDefine(v))
 type MapParse<T> = T extends [infer F, ...infer R]
-  ? [ParseDefine<F>, ...MapParse<R>]
+  ? [Parse2Define<F>, ...MapParse<R>]
   : [];
 
 // define object -> type
@@ -96,8 +96,8 @@ type CLiteral<T> = T extends {
 type DMap<T> = Split<T, ','> extends [infer K, infer V]
   ? {
     type: 'map',
-    key: ParseDefine<K>,
-    value: ParseDefine<V>,
+    key: Parse2Define<K>,
+    value: Parse2Define<V>,
   }
   : unknown;
 // define -> type
@@ -111,7 +111,7 @@ type CMap<T> = T extends {
 // string: Set<number>
 type DSet<T> = {
   type: 'set',
-  value: ParseDefine<T>,
+  value: Parse2Define<T>,
 };
 // define -> type
 type CSet<T> = T extends {
@@ -123,7 +123,7 @@ type CSet<T> = T extends {
 // string: Promise<void>
 type DPromise<T> = {
   type: 'promise',
-  resolve: ParseDefine<T>,
+  resolve: Parse2Define<T>,
 };
 // define -> type
 type CPromise<T> = T extends {
@@ -136,8 +136,8 @@ type CPromise<T> = T extends {
 type DFunction<T> = Split<T, ','> extends [infer A, infer R]
   ? {
     type: 'function',
-    args: ParseDefine<A>,
-    return: ParseDefine<R>
+    args: Parse2Define<A>,
+    return: Parse2Define<R>
   }
   : unknown;
 // define -> type
@@ -169,7 +169,7 @@ type CUnion<T> = T extends {
 // string: Array<number> or number[]
 type DArray<T> = {
   type: 'array',
-  value: ParseDefine<T>,
+  value: Parse2Define<T>,
 };
 // define -> type
 type CArray<T> = T extends {
@@ -195,7 +195,7 @@ type FromSchemaUnionValue<T> = T extends [infer F, ...infer R]
 type FromSchemaValue<T> = T extends { type: 'union', value: infer V }
   ? FromSchemaUnionValue<V>[number]
   : T extends `@${infer S}`
-  ? FromDefine<ParseDefine<S>>
+  ? FromDefine<Parse2Define<S>>
   : FromSchema<T>;
 export type FromSchema<T> = T extends [unknown]
   ? FromSchema<T[0]>[]

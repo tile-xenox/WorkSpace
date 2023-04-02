@@ -36,6 +36,7 @@ const split = (str: string, delimiter: string) => {
       }
     }
   }
+  result.push(acc);
   return result;
 };
 
@@ -49,6 +50,12 @@ const primitiveChecker: Record<string, (arg: unknown) => boolean> = {
   unknown: () => true,
   never: () => false,
   void: (arg: unknown) => typeof arg === 'undefined',
+};
+
+const parse2checker = (str: string) => {
+  const s = str.trim();
+  const unionTuple = split(s, '|');
+
 };
 
 export const schemaChecker = <T extends Schema | [Schema]>(schema: T) => (arg: unknown): arg is FromSchema<T> => {
