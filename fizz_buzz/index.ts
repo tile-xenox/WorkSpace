@@ -17,3 +17,4 @@ type FizzBuzz<T extends number, R extends unknown[] = [], C extends unknown[] = 
   >;
 
 type Check = FizzBuzz<15>;
+
