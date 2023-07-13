@@ -1,6 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @returns {any}
+*/
+export function wasm_memory(): any;
+/**
 */
 export enum Cell {
   Dead = 0,
