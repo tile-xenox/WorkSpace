@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+
+            & .sample, .sample2 {
+                color: red;
+            }
+
+            &:focus {
+                background: linear-gradient(to right, magenta, yellow, cyan, magenta) 0% center/200%;
+                animation: gaming 2s linear infinite;
+                outline: none;
+            }
+        }
+        @keyframes gaming {
+            to {
+                background-position-x: 200%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div
+        tabindex="0"
+        class="container"
+    >
+        <div class="sample">
+            this is a test;
+
+            <div class="sample2">
+                this is a test 2!
+            </div>
+        </div>
+    </div>
+    <div class="sample2">
+        this is a test 2!
+    </div>
+</body>
+</html>
