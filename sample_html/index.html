@@ -5,40 +5,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        .container {
-
-            & .sample, .sample2 {
-                color: red;
+        @layer base {
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
 
-            &:focus {
-                background: linear-gradient(to right, magenta, yellow, cyan, magenta) 0% center/200%;
-                animation: gaming 2s linear infinite;
-                outline: none;
+            .container {
+                container-type: inline-size;
+                container-name: side-menu;
+
+                & .wrapper {
+                    --mode: side;
+                    --toggle: false;
+                    container-name: toggle-mode;
+                    display: flex;
+                    min-height: 100vh;
+                    position: relative;
+
+                    & .menu {
+                        inline-size: 10rem;
+                        border-inline-end: 1px solid black;
+                        transition: inline-size 1s;
+
+                        & > div {
+                            padding-block-start: 3rem;
+                            padding-inline-start: 1rem;
+                        }
+                    }
+
+                    & .toggle-button {
+                        padding: 0.5rem;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        z-index: 1;
+                        inline-size: 2rem;
+
+                        & > .hide {
+                            display: none;
+                        }
+
+                        & > input {
+                            position: absolute;
+                            inset: 0;
+                            opacity: 0;
+                        }
+                    }
+                    
+                    & .content {
+                        flex-grow: 1;
+                        padding-block-start: 3rem;
+                        padding-inline-start: 1rem;
+                    }
+                }
             }
         }
-        @keyframes gaming {
-            to {
-                background-position-x: 200%;
+
+        @container side-menu (inline-size < 30rem) {
+            .wrapper {
+                --mode: button;
             }
+            .wrapper:has(> .toggle-button > input:checked) {
+                --toggle: true;
+            }
+        }
+
+        @container toggle-mode style(--mode: side) {
+            .toggle-button {
+                display: none;
+            }
+        }
+
+        @container toggle-mode style(--mode: button) {
+            .menu {
+                position: absolute;
+                inline-size: 0;
+                overflow: hidden;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                background-color: white;
+                z-index: 2;
+            }
+        }
+
+        @container toggle-mode style(--toggle: true) {
+            .menu {
+                inline-size: min(10rem, 100%);
+            }
+
+            .toggle-button { z-index: 3; }
+            .toggle-button > .show { display: none; }
+            .toggle-button > .hide { display: block; }
         }
     </style>
 </head>
 <body>
-    <div
-        tabindex="0"
-        class="container"
-    >
-        <div class="sample">
-            this is a test;
-
-            <div class="sample2">
-                this is a test 2!
+    <div class="container">
+        <div class="wrapper">
+            <div class="menu">
+                <div>menu</div>
             </div>
+            <div class="toggle-button">
+                <img
+                    class="show"
+                    src="./bars-solid.svg"
+                    alt="show side menu"
+                    title="show side menu"
+                >
+                <img
+                    class="hide"
+                    src="./xmark-solid.svg"
+                    alt="hide side menu"
+                    title="hide side menu"
+                >
+                <input type="checkbox" name="toggle-menu">
+            </div>
+            <div class="content">content</div>
         </div>
-    </div>
-    <div class="sample2">
-        this is a test 2!
     </div>
 </body>
 </html>
