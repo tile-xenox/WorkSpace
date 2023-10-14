@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            height: 100vh;
+            position: relative;
+            --threshold: 480px;
+            --menu-width: 200;
+            --button-size: 35;
+
+            
+            & .side, .button, .content {
+                --side-width: max(calc(min(calc((100% - var(--threshold)) * 1000), 1px) * var(--menu-width)), 0px);
+                --base-width: min(calc((var(--threshold) - 100%) * 1000 + 1px), 1px);
+                --button-width: max(calc(var(--base-width) * var(--button-size)), 0px);
+                position: absolute;
+                top: 0;
+            }
+            
+            & .side, .content {
+                bottom: 0;
+                overflow-x: hidden;
+                overflow-y: auto;
+                & > .area {
+                    padding: 1rem;
+                }
+            }
+            
+            & .side {
+                --toggle-width: 0px;
+                left: 0;
+                width: min(calc(var(--side-width) + var(--toggle-width)), 100%);
+                border-right: 1px solid black;
+                background-color: white;
+                z-index: 1;
+
+                &:has(~ .button .toggle-menu:checked) {
+                    --toggle-width: max(calc(var(--base-width) * var(--menu-width)), 0px);
+                }
+            }
+
+            & .content {
+                --sub-width: var(--button-width);
+                left: calc(var(--side-width) + var(--sub-width));
+                right: 0;
+
+                &:has(~ .button .toggle-menu:checked) {
+                    --sub-width: 0px;
+                }
+            }
+
+            & .button {
+                width: var(--button-width);
+                overflow: hidden;
+                z-index: 2;
+
+                &:has(.toggle-menu:checked) {
+                    right: max(calc(100% - var(--menu-width) * 1px), 0px);
+                }
+
+                & > .area {
+                    padding: 0.5rem;
+                    display: flex;
+                    flex-direction: column;
+
+                    & .show {
+                        height: auto;
+
+                        &:has(~ .toggle-menu:checked) {
+                            height: 0;
+                        }
+                    }
+
+                    & .hide {
+                        height: 0;
+
+                        &:has(~ .toggle-menu:checked) {
+                            height: auto;
+                        }
+                    }
+
+                    & .toggle-menu {
+                        position: absolute;
+                        inset: 0;
+                        opacity: 0;
+                    }
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="side">
+            <div class="area">
+                menu
+            </div>
+        </div>
+        <div class="content">
+            <div class="area">
+                content
+            </div>
+        </div>
+        <div class="button">
+            <div class="area">
+                <img
+                    class="show"
+                    src="./bars-solid.svg"
+                    alt="show side menu"
+                    title="show side menu"
+                >
+                <img
+                    class="hide"
+                    src="./xmark-solid.svg"
+                    alt="hide side menu"
+                    title="hide side menu"
+                >
+                <input type="checkbox" name="toggle-menu" class="toggle-menu">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
