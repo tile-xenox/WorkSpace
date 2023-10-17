@@ -1,5 +1,5 @@
 ```ts
-import { effectScope } from 'vue';
+import { effectScope, type EffectScope, onScopeDispose } from 'vue';
 
 const createGlobalComposable = <P, U extends (...arg: never[]) => unknown>(arg: {
     provide: () => P,
@@ -42,5 +42,28 @@ const useSharingContext = createGlobalComposable({
         return innerFunc;
     }
 });
+
+const createSharedComposable = <A extends unknown[], R>(compose: (...args: A) => R): (...args: A) => R => {
+    let subscribers = 0;
+    let state: R | undefined;
+    let scope: EffectScope | undefined;
+
+    const dispose = () => {
+        if (scope && --subscribers <= 0) {
+            scope.stop();
+            state = scope = void 0;
+        }
+    };
+
+    return (...args: A) => {
+        subscribers++;
+        if (!state) {
+            scope = effectScope(true);
+            state = scope.run(() => compose(...args));
+        }
+        onScopeDispose(() => dispose());
+        return state;
+    }
+}
 
 ```
