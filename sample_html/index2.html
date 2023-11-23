@@ -11,10 +11,24 @@
             box-sizing: border-box;
         }
 
+        @property --menu-size-core {
+            syntax: "<length>";
+            initial-value: 0px;
+            inherits: false;
+        }
+
+        @property --button-size-core {
+            syntax: "<length>";
+            initial-value: 0px;
+            inherits: false;
+        }
+
         .container {
             --threshold: 480px;
-            --menu-size: 200;
-            --button-size: 35;
+            --menu-size-core: 10rem;
+            --button-size-core: 3rem;
+            --menu-size: tan(atan2(var(--menu-size-core), 1px));
+            --button-size: tan(atan2(var(--button-size-core), 1px));
             --side-base-width: clamp(0px, calc((100% - var(--threshold)) * 1000), 1px);
             --button-base-width: calc(1px - var(--side-base-width));
             --side-width: calc(var(--side-base-width) * var(--menu-size));
